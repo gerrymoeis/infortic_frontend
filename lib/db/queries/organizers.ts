@@ -60,15 +60,14 @@ export async function searchOrganizers(query: string, limit: number = 10): Promi
 }
 
 /**
- * Get all verified organizers
+ * Get all organizers
  * 
- * @returns Array of verified organizers
+ * @returns Array of organizers
  */
-export async function getVerifiedOrganizers(): Promise<Organizer[]> {
+export async function getAllOrganizers(): Promise<Organizer[]> {
   const results = await db
     .select()
     .from(organizers)
-    .where(eq(organizers.verified, true))
     .orderBy(organizers.name)
 
   return results

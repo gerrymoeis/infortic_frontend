@@ -1,6 +1,7 @@
 /**
  * Application Constants
  * Centralized configuration values
+ * Based on ACTUAL 6-table database structure
  */
 
 // ============================================================================
@@ -14,28 +15,28 @@ export const PAGINATION = {
 } as const
 
 // ============================================================================
-// OPPORTUNITY STATUS
+// OPPORTUNITY STATUS (ACTUAL values from database)
 // ============================================================================
 
 export const OPPORTUNITY_STATUS = {
-  DRAFT: 'draft',
   ACTIVE: 'active', // Published and visible
-  EXPIRED: 'expired',
+  EXPIRED: 'expired', // Past deadline
+  ARCHIVED: 'archived', // Manually archived
 } as const
 
 export type OpportunityStatus = typeof OPPORTUNITY_STATUS[keyof typeof OPPORTUNITY_STATUS]
 
 // ============================================================================
-// LOCATION TYPES
+// EVENT TYPES
 // ============================================================================
 
-export const LOCATION_TYPE = {
+export const EVENT_TYPE = {
   ONLINE: 'online',
   OFFLINE: 'offline',
   HYBRID: 'hybrid',
 } as const
 
-export type LocationType = typeof LOCATION_TYPE[keyof typeof LOCATION_TYPE]
+export type EventType = typeof EVENT_TYPE[keyof typeof EVENT_TYPE]
 
 // ============================================================================
 // FEE TYPES
@@ -48,19 +49,6 @@ export const FEE_TYPE = {
 } as const
 
 export type FeeType = typeof FEE_TYPE[keyof typeof FEE_TYPE]
-
-// ============================================================================
-// ATTRIBUTE DATA TYPES
-// ============================================================================
-
-export const ATTRIBUTE_DATA_TYPE = {
-  TEXT: 'text',
-  NUMBER: 'number',
-  BOOLEAN: 'boolean',
-  ENUM: 'enum',
-} as const
-
-export type AttributeDataType = typeof ATTRIBUTE_DATA_TYPE[keyof typeof ATTRIBUTE_DATA_TYPE]
 
 // ============================================================================
 // LANGUAGE
@@ -119,7 +107,7 @@ export const CACHE_TAG = {
 } as const
 
 // ============================================================================
-// OPPORTUNITY TYPE CODES
+// OPPORTUNITY TYPE CODES (ACTUAL from database)
 // ============================================================================
 
 export const OPPORTUNITY_TYPE_CODE = {
@@ -136,7 +124,7 @@ export const OPPORTUNITY_TYPE_CODE = {
 } as const
 
 // ============================================================================
-// AUDIENCE CODES
+// AUDIENCE CODES (ACTUAL from database)
 // ============================================================================
 
 export const AUDIENCE_CODE = {
@@ -149,16 +137,6 @@ export const AUDIENCE_CODE = {
   D4: 'd4', // Diploma 4
   S1: 's1', // Bachelor's degree
   UMUM: 'umum', // General/public
-} as const
-
-// ============================================================================
-// PROMOTION
-// ============================================================================
-
-export const PROMOTION = {
-  DEFAULT_PRIORITY: 10,
-  MAX_PRIORITY: 100,
-  MIN_PRIORITY: 1,
 } as const
 
 // ============================================================================

@@ -1,15 +1,16 @@
 ﻿/**
  * Opportunity Queries
  * Repository pattern for opportunity data access
+ * Based on ACTUAL 6-table database structure
  */
 
 import { db } from '../client'
-import { opportunities, opportunityTypes, audiences, organizers, i18nLabels, opportunityAudiences, promotions } from '../schema'
-import { eq, desc, and, gte, or, ilike, sql, asc } from 'drizzle-orm'
-import type { OpportunityFilters, PaginationParams, SortParams, OpportunityListItem } from '@/types/database'
+import { opportunities, opportunityTypes, audiences, organizers, i18nLabels, opportunityAudiences } from '../schema'
+import { eq, desc, and, gte, or, ilike, sql } from 'drizzle-orm'
+import type { OpportunityListItem } from '@/types/database'
 
 /**
- * Get published opportunities with basic relations
+ * Get active opportunities with basic relations
  * Optimized for list views
  * 
  * @param limit - Number of results (default: 20)
@@ -29,22 +30,17 @@ export async function getPublishedOpportunities(
       deadlineDate: opportunities.deadlineDate,
       status: opportunities.status,
       createdAt: opportunities.createdAt,
+      eventType: opportunities.eventType,
+      feeType: opportunities.feeType,
+      imageUrl: opportunities.imageUrl,
       typeCode: opportunityTypes.code,
       typeLabel: i18nLabels.value,
       organizerName: organizers.name,
-      isPromoted: sql<boolean>`CASE 
-        WHEN ${promotions.active} = true 
-        AND (${promotions.endsAt} IS NULL OR ${promotions.endsAt} > NOW()) 
-        THEN true 
-        ELSE false 
-      END`,
-      promotionPriority: promotions.priority,
     })
     .from(opportunities)
     .leftJoin(opportunityTypes, eq(opportunities.typeId, opportunityTypes.id))
     .leftJoin(i18nLabels, eq(opportunityTypes.labelId, i18nLabels.id))
     .leftJoin(organizers, eq(opportunities.organizerId, organizers.id))
-    .leftJoin(promotions, eq(opportunities.id, promotions.opportunityId))
     .where(
       and(
         eq(opportunities.status, 'active'),
@@ -54,10 +50,7 @@ export async function getPublishedOpportunities(
         )
       )
     )
-    .orderBy(
-      desc(sql`CASE WHEN ${promotions.active} = true THEN ${promotions.priority} ELSE 0 END`),
-      desc(opportunities.createdAt)
-    )
+    .orderBy(desc(opportunities.createdAt))
     .limit(limit)
     .offset(offset)
 
@@ -69,6 +62,9 @@ export async function getPublishedOpportunities(
     deadlineDate: row.deadlineDate,
     status: row.status,
     createdAt: row.createdAt,
+    eventType: row.eventType,
+    feeType: row.feeType,
+    imageUrl: row.imageUrl,
     type: {
       code: row.typeCode || '',
       label: row.typeLabel,
@@ -76,7 +72,6 @@ export async function getPublishedOpportunities(
     organizer: row.organizerName ? {
       name: row.organizerName,
     } : null,
-    isPromoted: row.isPromoted || false,
   }))
 }
 
@@ -118,13 +113,6 @@ export async function getOpportunityBySlug(slug: string) {
     .leftJoin(i18nLabels, eq(audiences.labelId, i18nLabels.id))
     .where(eq(opportunityAudiences.opportunityId, opp.opportunity.id))
 
-  // Get promotion
-  const promotionData = await db
-    .select()
-    .from(promotions)
-    .where(eq(promotions.opportunityId, opp.opportunity.id))
-    .limit(1)
-
   return {
     ...opp.opportunity,
     type: {
@@ -136,7 +124,6 @@ export async function getOpportunityBySlug(slug: string) {
       code: a.code || '',
       label: a.label,
     })),
-    promotion: promotionData[0] || null,
   }
 }
 
@@ -178,21 +165,17 @@ export async function getOpportunitiesByType(
       deadlineDate: opportunities.deadlineDate,
       status: opportunities.status,
       createdAt: opportunities.createdAt,
+      eventType: opportunities.eventType,
+      feeType: opportunities.feeType,
+      imageUrl: opportunities.imageUrl,
       typeCode: opportunityTypes.code,
       typeLabel: i18nLabels.value,
       organizerName: organizers.name,
-      isPromoted: sql<boolean>`CASE 
-        WHEN ${promotions.active} = true 
-        AND (${promotions.endsAt} IS NULL OR ${promotions.endsAt} > NOW()) 
-        THEN true 
-        ELSE false 
-      END`,
     })
     .from(opportunities)
     .leftJoin(opportunityTypes, eq(opportunities.typeId, opportunityTypes.id))
     .leftJoin(i18nLabels, eq(opportunityTypes.labelId, i18nLabels.id))
     .leftJoin(organizers, eq(opportunities.organizerId, organizers.id))
-    .leftJoin(promotions, eq(opportunities.id, promotions.opportunityId))
     .where(
       and(
         eq(opportunities.status, 'active'),
@@ -203,10 +186,7 @@ export async function getOpportunitiesByType(
         )
       )
     )
-    .orderBy(
-      desc(sql`CASE WHEN ${promotions.active} = true THEN ${promotions.priority} ELSE 0 END`),
-      desc(opportunities.createdAt)
-    )
+    .orderBy(desc(opportunities.createdAt))
     .limit(limit)
     .offset(offset)
 
@@ -218,6 +198,9 @@ export async function getOpportunitiesByType(
     deadlineDate: row.deadlineDate,
     status: row.status,
     createdAt: row.createdAt,
+    eventType: row.eventType,
+    feeType: row.feeType,
+    imageUrl: row.imageUrl,
     type: {
       code: row.typeCode || '',
       label: row.typeLabel,
@@ -225,7 +208,6 @@ export async function getOpportunitiesByType(
     organizer: row.organizerName ? {
       name: row.organizerName,
     } : null,
-    isPromoted: row.isPromoted || false,
   }))
 }
 
@@ -251,21 +233,17 @@ export async function getOpportunitiesByAudience(
       deadlineDate: opportunities.deadlineDate,
       status: opportunities.status,
       createdAt: opportunities.createdAt,
+      eventType: opportunities.eventType,
+      feeType: opportunities.feeType,
+      imageUrl: opportunities.imageUrl,
       typeCode: opportunityTypes.code,
       typeLabel: i18nLabels.value,
       organizerName: organizers.name,
-      isPromoted: sql<boolean>`CASE 
-        WHEN ${promotions.active} = true 
-        AND (${promotions.endsAt} IS NULL OR ${promotions.endsAt} > NOW()) 
-        THEN true 
-        ELSE false 
-      END`,
     })
     .from(opportunities)
     .leftJoin(opportunityTypes, eq(opportunities.typeId, opportunityTypes.id))
     .leftJoin(i18nLabels, eq(opportunityTypes.labelId, i18nLabels.id))
     .leftJoin(organizers, eq(opportunities.organizerId, organizers.id))
-    .leftJoin(promotions, eq(opportunities.id, promotions.opportunityId))
     .innerJoin(opportunityAudiences, eq(opportunities.id, opportunityAudiences.opportunityId))
     .innerJoin(audiences, and(
       eq(opportunityAudiences.audienceId, audiences.id),
@@ -280,10 +258,7 @@ export async function getOpportunitiesByAudience(
         )
       )
     )
-    .orderBy(
-      desc(sql`CASE WHEN ${promotions.active} = true THEN ${promotions.priority} ELSE 0 END`),
-      desc(opportunities.createdAt)
-    )
+    .orderBy(desc(opportunities.createdAt))
     .limit(limit)
     .offset(offset)
 
@@ -295,6 +270,9 @@ export async function getOpportunitiesByAudience(
     deadlineDate: row.deadlineDate,
     status: row.status,
     createdAt: row.createdAt,
+    eventType: row.eventType,
+    feeType: row.feeType,
+    imageUrl: row.imageUrl,
     type: {
       code: row.typeCode || '',
       label: row.typeLabel,
@@ -302,7 +280,6 @@ export async function getOpportunitiesByAudience(
     organizer: row.organizerName ? {
       name: row.organizerName,
     } : null,
-    isPromoted: row.isPromoted || false,
   }))
 }
 
@@ -330,21 +307,17 @@ export async function searchOpportunities(
       deadlineDate: opportunities.deadlineDate,
       status: opportunities.status,
       createdAt: opportunities.createdAt,
+      eventType: opportunities.eventType,
+      feeType: opportunities.feeType,
+      imageUrl: opportunities.imageUrl,
       typeCode: opportunityTypes.code,
       typeLabel: i18nLabels.value,
       organizerName: organizers.name,
-      isPromoted: sql<boolean>`CASE 
-        WHEN ${promotions.active} = true 
-        AND (${promotions.endsAt} IS NULL OR ${promotions.endsAt} > NOW()) 
-        THEN true 
-        ELSE false 
-      END`,
     })
     .from(opportunities)
     .leftJoin(opportunityTypes, eq(opportunities.typeId, opportunityTypes.id))
     .leftJoin(i18nLabels, eq(opportunityTypes.labelId, i18nLabels.id))
     .leftJoin(organizers, eq(opportunities.organizerId, organizers.id))
-    .leftJoin(promotions, eq(opportunities.id, promotions.opportunityId))
     .where(
       and(
         eq(opportunities.status, 'active'),
@@ -366,6 +339,9 @@ export async function searchOpportunities(
     deadlineDate: row.deadlineDate,
     status: row.status,
     createdAt: row.createdAt,
+    eventType: row.eventType,
+    feeType: row.feeType,
+    imageUrl: row.imageUrl,
     type: {
       code: row.typeCode || '',
       label: row.typeLabel,
@@ -373,71 +349,11 @@ export async function searchOpportunities(
     organizer: row.organizerName ? {
       name: row.organizerName,
     } : null,
-    isPromoted: row.isPromoted || false,
   }))
 }
 
 /**
- * Get promoted opportunities
- * 
- * @param limit - Number of results
- * @returns Array of opportunity list items
- */
-export async function getPromotedOpportunities(limit: number = 5): Promise<OpportunityListItem[]> {
-  const results = await db
-    .select({
-      id: opportunities.id,
-      title: opportunities.title,
-      slug: opportunities.slug,
-      description: opportunities.description,
-      deadlineDate: opportunities.deadlineDate,
-      status: opportunities.status,
-      createdAt: opportunities.createdAt,
-      typeCode: opportunityTypes.code,
-      typeLabel: i18nLabels.value,
-      organizerName: organizers.name,
-      isPromoted: sql<boolean>`true`,
-      promotionPriority: promotions.priority,
-    })
-    .from(opportunities)
-    .leftJoin(opportunityTypes, eq(opportunities.typeId, opportunityTypes.id))
-    .leftJoin(i18nLabels, eq(opportunityTypes.labelId, i18nLabels.id))
-    .leftJoin(organizers, eq(opportunities.organizerId, organizers.id))
-    .innerJoin(promotions, eq(opportunities.id, promotions.opportunityId))
-    .where(
-      and(
-        eq(opportunities.status, 'active'),
-        eq(promotions.active, true),
-        or(
-          sql`${promotions.endsAt} IS NULL`,
-          gte(promotions.endsAt, new Date())
-        )
-      )
-    )
-    .orderBy(desc(promotions.priority), desc(opportunities.createdAt))
-    .limit(limit)
-
-  return results.map(row => ({
-    id: row.id,
-    title: row.title,
-    slug: row.slug,
-    description: row.description,
-    deadlineDate: row.deadlineDate,
-    status: row.status,
-    createdAt: row.createdAt,
-    type: {
-      code: row.typeCode || '',
-      label: row.typeLabel,
-    },
-    organizer: row.organizerName ? {
-      name: row.organizerName,
-    } : null,
-    isPromoted: true,
-  }))
-}
-
-/**
- * Count total published opportunities
+ * Count total active opportunities
  * Used for pagination
  * 
  * @returns Total count
@@ -458,4 +374,3 @@ export async function countPublishedOpportunities(): Promise<number> {
 
   return Number(result[0]?.count || 0)
 }
-

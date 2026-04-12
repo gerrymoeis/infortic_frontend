@@ -1,6 +1,7 @@
 /**
  * TypeScript Type Definitions
  * Inferred from Drizzle schema + custom composite types
+ * Based on ACTUAL 6-table database structure
  */
 
 import { InferSelectModel, InferInsertModel } from 'drizzle-orm'
@@ -14,18 +15,10 @@ export type Opportunity = InferSelectModel<typeof schema.opportunities>
 export type OpportunityType = InferSelectModel<typeof schema.opportunityTypes>
 export type Audience = InferSelectModel<typeof schema.audiences>
 export type Organizer = InferSelectModel<typeof schema.organizers>
-export type Location = InferSelectModel<typeof schema.locations>
-export type Fee = InferSelectModel<typeof schema.fees>
-export type Tag = InferSelectModel<typeof schema.tags>
-export type Attribute = InferSelectModel<typeof schema.attributes>
 export type I18nLabel = InferSelectModel<typeof schema.i18nLabels>
-export type Promotion = InferSelectModel<typeof schema.promotions>
 
 // Junction tables
 export type OpportunityAudience = InferSelectModel<typeof schema.opportunityAudiences>
-export type OpportunityFee = InferSelectModel<typeof schema.opportunityFees>
-export type OpportunityTag = InferSelectModel<typeof schema.opportunityTags>
-export type OpportunityAttribute = InferSelectModel<typeof schema.opportunityAttributes>
 
 // ============================================================================
 // INSERT TYPES (for creating new records)
@@ -35,10 +28,6 @@ export type OpportunityInsert = InferInsertModel<typeof schema.opportunities>
 export type OpportunityTypeInsert = InferInsertModel<typeof schema.opportunityTypes>
 export type AudienceInsert = InferInsertModel<typeof schema.audiences>
 export type OrganizerInsert = InferInsertModel<typeof schema.organizers>
-export type LocationInsert = InferInsertModel<typeof schema.locations>
-export type FeeInsert = InferInsertModel<typeof schema.fees>
-export type TagInsert = InferInsertModel<typeof schema.tags>
-export type PromotionInsert = InferInsertModel<typeof schema.promotions>
 
 // ============================================================================
 // COMPOSITE TYPES (with relations)
@@ -53,21 +42,10 @@ export type OpportunityWithRelations = Opportunity & {
     label: I18nLabel | null
   }
   organizer: Organizer | null
-  location: Location | null
   audiences: Array<{
-    audience: Audience & {
-      label: I18nLabel | null
-    }
+    code: string
+    label: string | null
   }>
-  fees: Array<{
-    fee: Fee
-  }>
-  tags: Array<{
-    tag: Tag & {
-      label: I18nLabel | null
-    }
-  }>
-  promotion: Promotion | null
 }
 
 /**
@@ -88,7 +66,9 @@ export type OpportunityListItem = {
   organizer: {
     name: string
   } | null
-  isPromoted: boolean
+  eventType: string | null
+  feeType: string | null
+  imageUrl: string | null
   createdAt: Date | null
 }
 
@@ -106,13 +86,6 @@ export type AudienceWithLabel = Audience & {
   label: I18nLabel | null
 }
 
-/**
- * Tag with label
- */
-export type TagWithLabel = Tag & {
-  label: I18nLabel | null
-}
-
 // ============================================================================
 // FILTER & SEARCH TYPES
 // ============================================================================
@@ -123,10 +96,11 @@ export type TagWithLabel = Tag & {
 export type OpportunityFilters = {
   typeCode?: string
   audienceCode?: string
-  status?: 'draft' | 'published' | 'expired'
+  status?: 'active' | 'expired' | 'archived'
   organizerId?: string
+  eventType?: 'online' | 'offline' | 'hybrid'
+  feeType?: 'gratis' | 'htm' | 'range'
   hasDeadline?: boolean
-  isPromoted?: boolean
   search?: string
 }
 
@@ -142,7 +116,7 @@ export type PaginationParams = {
  * Sort parameters
  */
 export type SortParams = {
-  field: 'createdAt' | 'deadlineDate' | 'title' | 'priority'
+  field: 'createdAt' | 'deadlineDate' | 'title'
   direction: 'asc' | 'desc'
 }
 
@@ -186,26 +160,26 @@ export type ErrorResponse = {
 // ============================================================================
 
 /**
- * Opportunity status values
+ * Opportunity status values (ACTUAL values from database)
  */
 export const OpportunityStatus = {
-  DRAFT: 'draft',
   ACTIVE: 'active', // Published and visible
-  EXPIRED: 'expired',
+  EXPIRED: 'expired', // Past deadline
+  ARCHIVED: 'archived', // Manually archived
 } as const
 
 export type OpportunityStatusType = typeof OpportunityStatus[keyof typeof OpportunityStatus]
 
 /**
- * Location type values
+ * Event type values
  */
-export const LocationType = {
+export const EventType = {
   ONLINE: 'online',
   OFFLINE: 'offline',
   HYBRID: 'hybrid',
 } as const
 
-export type LocationTypeType = typeof LocationType[keyof typeof LocationType]
+export type EventTypeType = typeof EventType[keyof typeof EventType]
 
 /**
  * Fee type values
@@ -217,15 +191,3 @@ export const FeeType = {
 } as const
 
 export type FeeTypeType = typeof FeeType[keyof typeof FeeType]
-
-/**
- * Attribute data type values
- */
-export const AttributeDataType = {
-  TEXT: 'text',
-  NUMBER: 'number',
-  BOOLEAN: 'boolean',
-  ENUM: 'enum',
-} as const
-
-export type AttributeDataTypeType = typeof AttributeDataType[keyof typeof AttributeDataType]

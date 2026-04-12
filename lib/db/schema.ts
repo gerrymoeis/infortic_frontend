@@ -1,14 +1,14 @@
 /**
  * Drizzle ORM Schema Definition
- * Matches PostgreSQL database schema from infortic_scraper backend
+ * Matches ACTUAL PostgreSQL database schema from infortic_scraper backend
  * 
  * Database: Neon PostgreSQL 17.8
- * Tables: 15 tables + 1 view
- * Relations: Fully normalized with foreign keys
+ * Tables: 6 tables (verified 2026-04-12)
+ * Source: Instagram scraper backend
  */
 
-import { pgTable, uuid, text, timestamp, date, boolean, integer, numeric, unique } from 'drizzle-orm/pg-core'
-import { relations } from 'drizzle-orm'
+import { pgTable, uuid, text, timestamp, date, boolean, integer, unique } from 'drizzle-orm/pg-core'
+import { relations, sql } from 'drizzle-orm'
 
 // ============================================================================
 // CORE TABLES
@@ -17,10 +17,11 @@ import { relations } from 'drizzle-orm'
 /**
  * i18n_labels - Internationalization labels
  * Used for translating type codes, audience codes, etc.
+ * Currently only Indonesian ('id') language
  */
 export const i18nLabels = pgTable('i18n_labels', {
   id: uuid('id').defaultRandom().primaryKey(),
-  language: text('language').notNull(), // e.g., 'id' for Indonesian
+  language: text('language').notNull(), // 'id' for Indonesian
   value: text('value').notNull(),
 }, (table) => ({
   // Unique constraint on language + value combination
@@ -29,114 +30,88 @@ export const i18nLabels = pgTable('i18n_labels', {
 
 /**
  * opportunity_types - Categories of opportunities
- * Examples: competition, scholarship, internship, job, freelance
+ * 10 types: competition, scholarship, internship, job, freelance, 
+ *           festival, training, workshop, hackathon, tryout
  */
 export const opportunityTypes = pgTable('opportunity_types', {
   id: uuid('id').defaultRandom().primaryKey(),
-  code: text('code').notNull().unique(), // e.g., 'competition', 'scholarship'
+  code: text('code').notNull().unique(),
   labelId: uuid('label_id').references(() => i18nLabels.id),
 })
 
 /**
  * audiences - Target audiences for opportunities
- * Examples: smp, sma, d3, d4, s1, umum (general)
+ * 9 audiences: smp, sma, d3, d4, s1, umum, sd, smk, d2
  */
 export const audiences = pgTable('audiences', {
   id: uuid('id').defaultRandom().primaryKey(),
-  code: text('code').notNull().unique(), // e.g., 'sma', 's1', 'umum'
+  code: text('code').notNull().unique(),
   labelId: uuid('label_id').references(() => i18nLabels.id),
 })
 
 /**
  * organizers - Event/opportunity organizers
+ * 146 organizers currently
  */
 export const organizers = pgTable('organizers', {
   id: uuid('id').defaultRandom().primaryKey(),
   name: text('name').notNull(),
-  website: text('website'),
-  contact: text('contact'),
-  verified: boolean('verified').default(false),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
-})
-
-/**
- * locations - Physical or online locations
- */
-export const locations = pgTable('locations', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  city: text('city'),
-  province: text('province'),
-  country: text('country').default('Indonesia'),
-  type: text('type'), // 'online' | 'offline' | 'hybrid'
-})
-
-/**
- * fees - Fee information for opportunities
- */
-export const fees = pgTable('fees', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  amount: numeric('amount'), // Decimal for currency
-  currency: text('currency').default('IDR'),
-  feeType: text('fee_type'), // 'gratis' | 'htm' | 'range'
-})
-
-/**
- * tags - Tagging system for opportunities
- */
-export const tags = pgTable('tags', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  code: text('code').notNull().unique(),
-  labelId: uuid('label_id').references(() => i18nLabels.id),
-})
-
-/**
- * attributes - EAV pattern for flexible attributes
- */
-export const attributes = pgTable('attributes', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  code: text('code').notNull().unique(),
-  dataType: text('data_type').notNull(), // 'text' | 'number' | 'boolean' | 'enum'
+  createdAt: timestamp('created_at', { withTimezone: true }),
+  slug: text('slug'),
+  updatedAt: timestamp('updated_at', { withTimezone: true }),
 })
 
 /**
  * opportunities - Main table for all opportunities
+ * 131 opportunities currently (116 active, 15 expired)
+ * 
+ * Instagram scraper specific fields:
+ * - post_id: Instagram post ID
+ * - source_url: Instagram URL
+ * - source_account: Instagram account
+ * - raw_caption: Original Instagram caption
+ * - image_url: Instagram image URL
+ * - downloaded_image: Local image path
+ * - secondary_sources: JSONB for merged duplicates
  */
 export const opportunities = pgTable('opportunities', {
   id: uuid('id').defaultRandom().primaryKey(),
   typeId: uuid('type_id').notNull().references(() => opportunityTypes.id),
   organizerId: uuid('organizer_id').references(() => organizers.id),
-  locationId: uuid('location_id').references(() => locations.id),
   title: text('title').notNull(),
   slug: text('slug').notNull().unique(),
   description: text('description'),
-  applyUrl: text('apply_url'),
+  rawCaption: text('raw_caption'), // Original Instagram caption
+  registrationUrl: text('registration_url'),
   startDate: date('start_date'),
   endDate: date('end_date'),
   deadlineDate: date('deadline_date'),
-  status: text('status').notNull(), // 'draft' | 'published' | 'expired'
+  status: text('status').notNull(), // 'active' | 'expired' | 'archived'
   publishedAt: timestamp('published_at', { withTimezone: true }),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }),
+  updatedAt: timestamp('updated_at', { withTimezone: true }),
+  
+  // Instagram scraper fields
+  postId: text('post_id'), // Instagram post ID
+  sourceUrl: text('source_url'), // Instagram URL
+  sourceAccount: text('source_account'), // Instagram account
+  contact: text('contact'),
+  eventType: text('event_type'), // 'online' | 'offline' | 'hybrid'
+  feeType: text('fee_type'), // 'gratis' | 'htm' | 'range'
+  imageUrl: text('image_url'), // Instagram image URL
+  downloadedImage: text('downloaded_image'), // Local image path
+  registrationDate: text('registration_date'),
+  viewCount: integer('view_count'),
+  isFeatured: boolean('is_featured'),
+  tags: text('tags').array(), // Text array for tags
+  expiredAt: timestamp('expired_at', { withTimezone: false }),
+  autoExpired: boolean('auto_expired'),
+  secondarySources: text('secondary_sources').$type<Record<string, any>>(), // JSONB for merged duplicates
 })
 
 /**
- * promotions - Paid promotion features
- */
-export const promotions = pgTable('promotions', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  opportunityId: uuid('opportunity_id').references(() => opportunities.id, { onDelete: 'cascade' }),
-  priority: integer('priority').default(10), // Higher = more prominent
-  startsAt: timestamp('starts_at', { withTimezone: true }).defaultNow(),
-  endsAt: timestamp('ends_at', { withTimezone: true }),
-  active: boolean('active').default(true),
-})
-
-// ============================================================================
-// JUNCTION TABLES (Many-to-Many Relationships)
-// ============================================================================
-
-/**
- * opportunity_audiences - Links opportunities to target audiences
+ * opportunity_audiences - Junction table
+ * Links opportunities to target audiences (many-to-many)
  */
 export const opportunityAudiences = pgTable('opportunity_audiences', {
   opportunityId: uuid('opportunity_id').notNull().references(() => opportunities.id, { onDelete: 'cascade' }),
@@ -144,39 +119,6 @@ export const opportunityAudiences = pgTable('opportunity_audiences', {
 }, (table) => ({
   // Composite primary key
   pk: unique().on(table.opportunityId, table.audienceId),
-}))
-
-/**
- * opportunity_fees - Links opportunities to fees
- */
-export const opportunityFees = pgTable('opportunity_fees', {
-  opportunityId: uuid('opportunity_id').notNull().references(() => opportunities.id, { onDelete: 'cascade' }),
-  feeId: uuid('fee_id').notNull().references(() => fees.id, { onDelete: 'cascade' }),
-}, (table) => ({
-  pk: unique().on(table.opportunityId, table.feeId),
-}))
-
-/**
- * opportunity_tags - Links opportunities to tags
- */
-export const opportunityTags = pgTable('opportunity_tags', {
-  opportunityId: uuid('opportunity_id').notNull().references(() => opportunities.id, { onDelete: 'cascade' }),
-  tagId: uuid('tag_id').notNull().references(() => tags.id, { onDelete: 'cascade' }),
-}, (table) => ({
-  pk: unique().on(table.opportunityId, table.tagId),
-}))
-
-/**
- * opportunity_attributes - EAV pattern for flexible attributes
- */
-export const opportunityAttributes = pgTable('opportunity_attributes', {
-  opportunityId: uuid('opportunity_id').notNull().references(() => opportunities.id, { onDelete: 'cascade' }),
-  attributeId: uuid('attribute_id').notNull().references(() => attributes.id, { onDelete: 'cascade' }),
-  valueText: text('value_text'),
-  valueNumber: numeric('value_number'),
-  valueBoolean: boolean('value_boolean'),
-}, (table) => ({
-  pk: unique().on(table.opportunityId, table.attributeId),
 }))
 
 // ============================================================================
@@ -192,18 +134,7 @@ export const opportunitiesRelations = relations(opportunities, ({ one, many }) =
     fields: [opportunities.organizerId],
     references: [organizers.id],
   }),
-  location: one(locations, {
-    fields: [opportunities.locationId],
-    references: [locations.id],
-  }),
   audiences: many(opportunityAudiences),
-  fees: many(opportunityFees),
-  tags: many(opportunityTags),
-  attributes: many(opportunityAttributes),
-  promotion: one(promotions, {
-    fields: [opportunities.id],
-    references: [promotions.opportunityId],
-  }),
 }))
 
 export const opportunityTypesRelations = relations(opportunityTypes, ({ one, many }) => ({
@@ -234,42 +165,5 @@ export const opportunityAudiencesRelations = relations(opportunityAudiences, ({ 
   audience: one(audiences, {
     fields: [opportunityAudiences.audienceId],
     references: [audiences.id],
-  }),
-}))
-
-export const opportunityFeesRelations = relations(opportunityFees, ({ one }) => ({
-  opportunity: one(opportunities, {
-    fields: [opportunityFees.opportunityId],
-    references: [opportunities.id],
-  }),
-  fee: one(fees, {
-    fields: [opportunityFees.feeId],
-    references: [fees.id],
-  }),
-}))
-
-export const opportunityTagsRelations = relations(opportunityTags, ({ one }) => ({
-  opportunity: one(opportunities, {
-    fields: [opportunityTags.opportunityId],
-    references: [opportunities.id],
-  }),
-  tag: one(tags, {
-    fields: [opportunityTags.tagId],
-    references: [tags.id],
-  }),
-}))
-
-export const tagsRelations = relations(tags, ({ one, many }) => ({
-  label: one(i18nLabels, {
-    fields: [tags.labelId],
-    references: [i18nLabels.id],
-  }),
-  opportunityTags: many(opportunityTags),
-}))
-
-export const promotionsRelations = relations(promotions, ({ one }) => ({
-  opportunity: one(opportunities, {
-    fields: [promotions.opportunityId],
-    references: [opportunities.id],
   }),
 }))

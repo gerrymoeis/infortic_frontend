@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod'
-import { OPPORTUNITY_STATUS, LOCATION_TYPE, FEE_TYPE, TEXT_LIMIT, VALIDATION } from './constants'
+import { OPPORTUNITY_STATUS, EVENT_TYPE, FEE_TYPE, TEXT_LIMIT, VALIDATION } from './constants'
 
 // ============================================================================
 // OPPORTUNITY SCHEMAS
@@ -16,10 +16,9 @@ import { OPPORTUNITY_STATUS, LOCATION_TYPE, FEE_TYPE, TEXT_LIMIT, VALIDATION } f
 export const opportunityFilterSchema = z.object({
   typeCode: z.string().optional(),
   audienceCode: z.string().optional(),
-  status: z.enum([OPPORTUNITY_STATUS.DRAFT, OPPORTUNITY_STATUS.ACTIVE, OPPORTUNITY_STATUS.EXPIRED]).optional(),
+  status: z.enum([OPPORTUNITY_STATUS.ACTIVE, OPPORTUNITY_STATUS.EXPIRED, OPPORTUNITY_STATUS.ARCHIVED]).optional(),
   organizerId: z.string().uuid().optional(),
   hasDeadline: z.boolean().optional(),
-  isPromoted: z.boolean().optional(),
   search: z.string().min(VALIDATION.MIN_SEARCH_LENGTH).max(VALIDATION.MAX_SEARCH_LENGTH).optional(),
 })
 
@@ -75,7 +74,7 @@ export const eventSubmissionSchema = z.object({
   endDate: z.string().date().optional().or(z.literal('')),
   deadlineDate: z.string().date(),
   audienceCodes: z.array(z.string()).min(1),
-  locationType: z.enum([LOCATION_TYPE.ONLINE, LOCATION_TYPE.OFFLINE, LOCATION_TYPE.HYBRID]).optional(),
+  eventType: z.enum([EVENT_TYPE.ONLINE, EVENT_TYPE.OFFLINE, EVENT_TYPE.HYBRID]).optional(),
   locationCity: z.string().optional(),
   locationProvince: z.string().optional(),
   feeType: z.enum([FEE_TYPE.GRATIS, FEE_TYPE.HTM, FEE_TYPE.RANGE]).optional(),
@@ -128,7 +127,7 @@ export const opportunityUpdateSchema = z.object({
   id: z.string().uuid(),
   title: z.string().min(5).max(TEXT_LIMIT.TITLE_MAX).optional(),
   description: z.string().min(20).max(TEXT_LIMIT.DESCRIPTION_MAX).optional(),
-  status: z.enum([OPPORTUNITY_STATUS.DRAFT, OPPORTUNITY_STATUS.ACTIVE, OPPORTUNITY_STATUS.EXPIRED]).optional(),
+  status: z.enum([OPPORTUNITY_STATUS.ACTIVE, OPPORTUNITY_STATUS.EXPIRED, OPPORTUNITY_STATUS.ARCHIVED]).optional(),
   applyUrl: z.string().url().optional(),
   deadlineDate: z.string().date().optional(),
 })
