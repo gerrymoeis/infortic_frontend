@@ -1,39 +1,25 @@
 /**
  * Opportunities List Page
- * Paginated list of all active opportunities with ISR
- * Revalidates every 1 hour
+ * All active opportunities with client-side search, filter, and sort
+ * ISR with 1h revalidation
  */
 
-import Link from 'next/link'
-import { getPublishedOpportunities, countPublishedOpportunities } from '@/lib/db/queries/opportunities'
-import { OpportunityList } from '@/components/opportunities/opportunity-list'
-import { Button } from '@/components/ui/button'
-import { PAGINATION } from '@/lib/utils/constants'
+import { getPublishedOpportunities } from '@/lib/db/queries/opportunities'
+import { getAllOpportunityTypes } from '@/lib/db/queries/types'
+import { getAllAudiences } from '@/lib/db/queries/audiences'
+import { OpportunitiesClient } from '@/components/opportunities/opportunities-client'
 
 // ISR: Revalidate every 1 hour (3600 seconds)
 export const revalidate = 3600
 
-interface OpportunitiesPageProps {
-  searchParams: Promise<{
-    page?: string
-  }>
-}
-
-export default async function OpportunitiesPage({ searchParams }: OpportunitiesPageProps) {
-  const params = await searchParams
-  const currentPage = parseInt(params.page || '1', 10)
-  const limit = PAGINATION.DEFAULT_LIMIT
-  const offset = (currentPage - 1) * limit
-
-  // Fetch opportunities and total count
-  const [opportunities, totalCount] = await Promise.all([
-    getPublishedOpportunities(limit, offset),
-    countPublishedOpportunities(),
+export default async function OpportunitiesPage() {
+  // Fetch all active opportunities (no pagination - client-side filtering)
+  // For 1,000 opportunities, this is acceptable for client-side filtering
+  const [opportunities, types, audiences] = await Promise.all([
+    getPublishedOpportunities(1000, 0), // Get up to 1000 opportunities
+    getAllOpportunityTypes(),
+    getAllAudiences(),
   ])
-
-  const totalPages = Math.ceil(totalCount / limit)
-  const hasNextPage = currentPage < totalPages
-  const hasPrevPage = currentPage > 1
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -42,69 +28,16 @@ export default async function OpportunitiesPage({ searchParams }: OpportunitiesP
         <div className="mb-8">
           <h1 className="mb-2 text-3xl font-bold text-gray-900">Semua Peluang</h1>
           <p className="text-gray-600">
-            Menampilkan {opportunities.length} dari {totalCount} peluang aktif
+            Temukan peluang yang sesuai dengan minat dan kebutuhanmu
           </p>
         </div>
 
-        {/* Opportunity List */}
-        <OpportunityList
-          opportunities={opportunities}
-          emptyMessage="Tidak ada peluang yang tersedia saat ini."
+        {/* Client-side Search, Filter, Sort */}
+        <OpportunitiesClient
+          initialOpportunities={opportunities}
+          types={types}
+          audiences={audiences}
         />
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="mt-12 flex items-center justify-center gap-2">
-            {/* Previous Button */}
-            {hasPrevPage ? (
-              <Link href={`/opportunities?page=${currentPage - 1}`}>
-                <Button variant="outline">← Sebelumnya</Button>
-              </Link>
-            ) : (
-              <Button variant="outline" disabled>
-                ← Sebelumnya
-              </Button>
-            )}
-
-            {/* Page Numbers */}
-            <div className="flex items-center gap-2">
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                let pageNum: number
-                if (totalPages <= 5) {
-                  pageNum = i + 1
-                } else if (currentPage <= 3) {
-                  pageNum = i + 1
-                } else if (currentPage >= totalPages - 2) {
-                  pageNum = totalPages - 4 + i
-                } else {
-                  pageNum = currentPage - 2 + i
-                }
-
-                return (
-                  <Link key={pageNum} href={`/opportunities?page=${pageNum}`}>
-                    <Button
-                      variant={currentPage === pageNum ? 'primary' : 'outline'}
-                      size="sm"
-                    >
-                      {pageNum}
-                    </Button>
-                  </Link>
-                )
-              })}
-            </div>
-
-            {/* Next Button */}
-            {hasNextPage ? (
-              <Link href={`/opportunities?page=${currentPage + 1}`}>
-                <Button variant="outline">Selanjutnya →</Button>
-              </Link>
-            ) : (
-              <Button variant="outline" disabled>
-                Selanjutnya →
-              </Button>
-            )}
-          </div>
-        )}
       </div>
     </div>
   )
