@@ -31,7 +31,7 @@ export function OpportunitiesClient({
     feeTypes: [],
     eventTypes: [],
   })
-  const [showFilters, setShowFilters] = useState(false)
+  const [showMobileFilters, setShowMobileFilters] = useState(false)
 
   // Filter and sort opportunities
   const filteredOpportunities = useMemo(() => {
@@ -111,9 +111,12 @@ export function OpportunitiesClient({
         <div className="flex items-center gap-4">
           <OpportunitySort value={sortBy} onChange={setSortBy} />
           <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:hidden"
+            onClick={() => setShowMobileFilters(!showMobileFilters)}
+            className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 lg:hidden"
           >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
             Filter
           </button>
         </div>
@@ -133,9 +136,9 @@ export function OpportunitiesClient({
       </div>
 
       {/* Main Content */}
-      <div className="flex gap-8">
-        {/* Filters Sidebar (Desktop) */}
-        <aside className={`w-64 shrink-0 ${showFilters ? 'block' : 'hidden'} sm:block`}>
+      <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
+        {/* Filters Sidebar - Desktop (always visible on lg+) */}
+        <aside className="hidden w-64 shrink-0 lg:block">
           <div className="sticky top-24 rounded-lg border border-gray-200 bg-white p-6">
             <OpportunityFilters
               types={types}
@@ -146,8 +149,31 @@ export function OpportunitiesClient({
           </div>
         </aside>
 
+        {/* Filters Panel - Mobile (collapsible) */}
+        {showMobileFilters && (
+          <div className="rounded-lg border border-gray-200 bg-white p-6 lg:hidden">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900">Filter</h3>
+              <button
+                onClick={() => setShowMobileFilters(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <OpportunityFilters
+              types={types}
+              audiences={audiences}
+              filters={filters}
+              onFilterChange={setFilters}
+            />
+          </div>
+        )}
+
         {/* Opportunities List */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <OpportunityList
             opportunities={filteredOpportunities}
             emptyMessage={
