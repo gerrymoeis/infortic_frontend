@@ -434,9 +434,28 @@ Route (app)                Revalidate  Expire
 - [x] Bundle analyzer (configured)
 - [x] Cache headers (configured)
 - [x] Git commit & push
+- [x] Mobile UI fixed (filter sidebar responsive)
+- [x] Windows analyze command fixed (cross-env)
 - [ ] Browser testing (image fallbacks)
 - [ ] Bundle analysis (run npm run analyze)
+- [ ] Mobile device testing (actual devices)
 - [ ] Performance audit (Lighthouse - after deployment)
+
+### Bug Fixes (April 12, 2026)
+**Issue 1: Windows Analyze Command**
+- Problem: `'ANALYZE' is not recognized` error on Windows
+- Solution: Installed cross-env, updated to use `next experimental-analyze`
+- Status: ✅ Fixed
+
+**Issue 2: Mobile UI/UX Problems**
+- Problem: Filter sidebar taking too much space on mobile, opportunities squeezed
+- Solution: 
+  - Filters hidden by default on mobile (collapsible panel)
+  - Changed breakpoint from sm to lg for desktop sidebar
+  - Adjusted grid: 1 col mobile, 2 cols tablet, 3 cols large desktop
+  - Added close button to mobile filter panel
+  - Better responsive layout with flex-col on mobile
+- Status: ✅ Fixed
 
 ### What's Next
 Phase 4.2 is complete! Ready for Phase 4.3 (Cloudflare Pages Deployment):
