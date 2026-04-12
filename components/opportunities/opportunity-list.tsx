@@ -4,24 +4,35 @@
  */
 
 import { OpportunityCard } from './opportunity-card'
+import { EmptyState } from '@/components/ui/empty-state'
+import { Button } from '@/components/ui/button'
 import type { OpportunityListItem } from '@/types/database'
 
 interface OpportunityListProps {
   opportunities: OpportunityListItem[]
   emptyMessage?: string
+  showEmptyAction?: boolean
 }
 
 export function OpportunityList({
   opportunities,
   emptyMessage = 'Tidak ada peluang yang ditemukan.',
+  showEmptyAction = true,
 }: OpportunityListProps) {
   if (opportunities.length === 0) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <div className="text-center">
-          <p className="text-lg text-gray-600">{emptyMessage}</p>
-        </div>
-      </div>
+      <EmptyState
+        icon="🔍"
+        title="Tidak Ada Hasil"
+        description={emptyMessage}
+        action={
+          showEmptyAction ? (
+            <Button variant="outline" onClick={() => window.location.reload()}>
+              Muat Ulang
+            </Button>
+          ) : undefined
+        }
+      />
     )
   }
 
