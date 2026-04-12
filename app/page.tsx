@@ -1,7 +1,7 @@
 /**
  * Homepage
- * Displays recent opportunities
- * Dynamic rendering (will be changed to ISR after database verification)
+ * Displays recent opportunities with ISR
+ * Revalidates every 1 hour
  */
 
 import Link from 'next/link'
@@ -9,8 +9,8 @@ import { getPublishedOpportunities } from '@/lib/db/queries/opportunities'
 import { OpportunityList } from '@/components/opportunities/opportunity-list'
 import { Button } from '@/components/ui/button'
 
-// Force dynamic rendering for now
-export const dynamic = 'force-dynamic'
+// ISR: Revalidate every 1 hour (3600 seconds)
+export const revalidate = 3600
 
 export default async function HomePage() {
   // Fetch recent opportunities (limit 12 for homepage)

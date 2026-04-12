@@ -1,7 +1,7 @@
 /**
  * Opportunity Detail Page
- * Full details of a single opportunity
- * Dynamic rendering (will be changed to ISR after database verification)
+ * Full details of a single opportunity with ISR
+ * Revalidates every 1 hour
  */
 
 import { notFound } from 'next/navigation'
@@ -12,8 +12,8 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { formatDate, formatDeadline } from '@/lib/utils/formatting'
 
-// Force dynamic rendering for now
-export const dynamic = 'force-dynamic'
+// ISR: Revalidate every 1 hour (3600 seconds)
+export const revalidate = 3600
 
 interface OpportunityDetailPageProps {
   params: Promise<{

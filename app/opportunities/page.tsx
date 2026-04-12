@@ -1,7 +1,7 @@
 /**
  * Opportunities List Page
- * Paginated list of all active opportunities
- * Dynamic rendering (will be changed to ISR after database verification)
+ * Paginated list of all active opportunities with ISR
+ * Revalidates every 1 hour
  */
 
 import Link from 'next/link'
@@ -10,8 +10,8 @@ import { OpportunityList } from '@/components/opportunities/opportunity-list'
 import { Button } from '@/components/ui/button'
 import { PAGINATION } from '@/lib/utils/constants'
 
-// Force dynamic rendering for now
-export const dynamic = 'force-dynamic'
+// ISR: Revalidate every 1 hour (3600 seconds)
+export const revalidate = 3600
 
 interface OpportunitiesPageProps {
   searchParams: Promise<{

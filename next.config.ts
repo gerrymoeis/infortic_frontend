@@ -12,6 +12,17 @@ const nextConfig: NextConfig = {
         hostname: 'images.infortic.com',
         pathname: '/**',
       },
+      // Instagram CDN domains (temporary until images are migrated to R2)
+      {
+        protocol: 'https',
+        hostname: '**.cdninstagram.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.fbcdn.net',
+        pathname: '/**',
+      },
     ],
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 2592000, // 30 days
