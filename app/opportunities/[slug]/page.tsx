@@ -5,12 +5,13 @@
  */
 
 import { notFound } from 'next/navigation'
-import Image from 'next/image'
 import Link from 'next/link'
 import { getOpportunityBySlug } from '@/lib/db/queries/opportunities'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { formatDate, formatDeadline } from '@/lib/utils/formatting'
+import { BLUR_DATA_URL } from '@/lib/constants/images'
+import { OptimizedImage } from '@/components/ui/optimized-image'
 
 // ISR: Revalidate every 1 hour (3600 seconds)
 export const revalidate = 3600
@@ -46,13 +47,15 @@ export default async function OpportunityDetailPage({ params }: OpportunityDetai
           <div className="overflow-hidden rounded-lg bg-white shadow-sm">
             {/* Image */}
             {opportunity.imageUrl && (
-              <div className="relative h-96 w-full">
-                <Image
+              <div className="relative h-96 w-full bg-gray-100">
+                <OptimizedImage
                   src={opportunity.imageUrl}
                   alt={opportunity.title}
                   fill
                   className="object-cover"
                   priority
+                  placeholder="blur"
+                  blurDataURL={BLUR_DATA_URL}
                 />
               </div>
             )}

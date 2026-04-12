@@ -7,7 +7,13 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { MobileMenu } from './mobile-menu'
+import dynamic from 'next/dynamic'
+
+// Lazy load mobile menu (only loads when needed)
+const MobileMenu = dynamic(() => import('./mobile-menu').then(mod => ({ default: mod.MobileMenu })), {
+  ssr: false,
+  loading: () => null,
+})
 
 export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)

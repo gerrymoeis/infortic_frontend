@@ -4,10 +4,11 @@
  */
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { formatDate, formatDeadline, truncateText } from '@/lib/utils/formatting'
+import { BLUR_DATA_URL } from '@/lib/constants/images'
+import { OptimizedImage } from '@/components/ui/optimized-image'
 import type { OpportunityListItem } from '@/types/database'
 
 interface OpportunityCardProps {
@@ -22,13 +23,15 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
       <Card className="h-full transition-all hover:border-blue-300">
         {/* Image */}
         {opportunity.imageUrl && (
-          <div className="relative h-48 w-full overflow-hidden rounded-t-lg">
-            <Image
+          <div className="relative h-48 w-full overflow-hidden rounded-t-lg bg-gray-100">
+            <OptimizedImage
               src={opportunity.imageUrl}
               alt={opportunity.title}
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
             />
           </div>
         )}
