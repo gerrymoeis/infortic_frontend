@@ -20,30 +20,30 @@
 ## Phase 3: Enhanced Discovery & Navigation 🚧 IN PROGRESS
 
 ### Status
-- **Build**: ✅ Successful (8.4s)
+- **Build**: ✅ Successful (7.1s)
 - **TypeScript**: ✅ No errors
-- **Progress**: 3.1 Category System ✅ Complete
+- **Progress**: 3.1 ✅ | 3.2 ✅ | 3.3 Next
 
-### Completed (3.1 - Category System)
+### Completed
 
-#### Pages (2)
-1. **Categories Index** (`/categories`) - Browse all types, ISR 24h
-2. **Category Detail** (`/categories/[code]`) - Filter by type, ISR 1h
-
-#### Features
+#### 3.1 - Category System ✅
+- Categories index page (`/categories`) - ISR 24h
+- Category detail pages (`/categories/[code]`) - ISR 1h
 - Type cards with icons and counts
 - Breadcrumb navigation
-- Pagination on category pages
-- 10 opportunity types displayed
 
-#### Database
-- `getOpportunityTypesWithCounts()` - Efficient GROUP BY query
+#### 3.2 - Search & Filters ✅
+- Search component with 300ms debounce
+- Filter by type, audience, fee type, event type
+- Sort by newest, deadline, title
+- Active filter chips (removable)
+- Client-side filtering (instant results)
+- Loads up to 1000 opportunities with ISR
 
-### Next Steps (3.2 - Search & Filters)
-- [ ] Search component with debounce
-- [ ] Filter component (type, audience, fee, event)
-- [ ] Sort component (newest, deadline, title)
-- [ ] Integration with opportunities list page
+### Next Steps (3.3 - Mobile Menu)
+- [ ] Mobile menu component
+- [ ] Slide-out drawer
+- [ ] Update header for mobile
 
 ---
 
