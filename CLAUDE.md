@@ -15,6 +15,47 @@
 - **ISR**: ✅ Enabled (1h revalidation)
 - **Dev Server**: ✅ Running on http://localhost:3000
 
+---
+
+## Phase 3: Enhanced Discovery & Navigation 🚧 IN PROGRESS
+
+### Status
+- **Build**: ✅ Successful (8.4s)
+- **TypeScript**: ✅ No errors
+- **Progress**: 3.1 Category System ✅ Complete
+
+### Completed (3.1 - Category System)
+
+#### Pages (2)
+1. **Categories Index** (`/categories`) - Browse all types, ISR 24h
+2. **Category Detail** (`/categories/[code]`) - Filter by type, ISR 1h
+
+#### Features
+- Type cards with icons and counts
+- Breadcrumb navigation
+- Pagination on category pages
+- 10 opportunity types displayed
+
+#### Database
+- `getOpportunityTypesWithCounts()` - Efficient GROUP BY query
+
+### Next Steps (3.2 - Search & Filters)
+- [ ] Search component with debounce
+- [ ] Filter component (type, audience, fee, event)
+- [ ] Sort component (newest, deadline, title)
+- [ ] Integration with opportunities list page
+
+---
+
+## Phase 2: Core Pages & UI Components ✅ COMPLETE
+
+### Status
+- **Build**: ✅ Successful (8.6s)
+- **TypeScript**: ✅ No errors
+- **Database**: ✅ Connected (131 opportunities)
+- **ISR**: ✅ Enabled (1h revalidation)
+- **Dev Server**: ✅ Running on http://localhost:3000
+
 ### Critical Issue Resolved
 **Problem**: Build failing with "cluster kai-clone-18571 not found"  
 **Cause**: PowerShell environment variable `DATABASE_URL` overriding `.env.local`  
@@ -98,10 +139,27 @@ components/
 
 ## Important Notes
 
-### Environment Variables
-- **CRITICAL**: PowerShell env variables override `.env.local`
-- Always check: `Get-ChildItem Env: | Where-Object { $_.Name -like "*DATABASE*" }`
-- Remove if found: `Remove-Item Env:\DATABASE_URL`
+## Important Notes
+
+### Environment Variables - CRITICAL FIX APPLIED ✅
+
+**Issue**: PowerShell `DATABASE_URL` environment variable was overriding `.env.local`
+
+**Solution**: Permanently removed from Windows user environment:
+```powershell
+[System.Environment]::SetEnvironmentVariable("DATABASE_URL", $null, "User")
+```
+
+**IMPORTANT**: You must restart your terminal/IDE for this to take effect!
+
+**To verify it's fixed** (after restart):
+```powershell
+$env:DATABASE_URL  # Should be empty
+```
+
+**Prevention**: Never set `DATABASE_URL` as a system/user environment variable. Always use `.env.local` files.
+
+---
 
 ### Database Connection
 - Using Neon PostgreSQL (not CockroachDB)
