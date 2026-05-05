@@ -18,7 +18,9 @@
     "db:test": "tsx scripts/test-db.ts",
     "db:test-queries": "tsx scripts/test-queries.ts",
     "pages:build": "npx @opennextjs/cloudflare build",
-    "pages:deploy": "npm run pages:build && wrangler pages deploy .vercel/output/static"
+    "pages:deploy": "npm run pages:build && wrangler pages deploy .vercel/output/static",
+    "deploy": "npm run pages:build && wrangler deploy",
+    "deploy:production": "wrangler deploy --env production"
   },
   "dependencies": {
     "@stripe/stripe-js": "^9.1.0",
