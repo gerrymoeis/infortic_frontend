@@ -1,8 +1,12 @@
 /**
  * Audience Queries
  * Repository pattern for audience data access
+ * 
+ * OPTIMIZATION: All queries are cached with Next.js unstable_cache
+ * Cache duration: 24 hours (86400 seconds) - audiences rarely change
  */
 
+import { unstable_cache } from 'next/cache'
 import { db } from '../client'
 import { audiences, i18nLabels } from '../schema'
 import { eq } from 'drizzle-orm'
@@ -12,27 +16,36 @@ import type { AudienceWithLabel } from '@/types/database'
  * Get all audiences with labels
  * Used for filters
  * 
+ * CACHED: 24 hours (86400 seconds)
+ * 
  * @returns Array of audiences with labels
  */
-export async function getAllAudiences(): Promise<AudienceWithLabel[]> {
-  const results = await db
-    .select({
-      id: audiences.id,
-      code: audiences.code,
-      labelId: audiences.labelId,
-      label: i18nLabels,
-    })
-    .from(audiences)
-    .leftJoin(i18nLabels, eq(audiences.labelId, i18nLabels.id))
-    .orderBy(audiences.code)
+export const getAllAudiences = unstable_cache(
+  async (): Promise<AudienceWithLabel[]> => {
+    const results = await db
+      .select({
+        id: audiences.id,
+        code: audiences.code,
+        labelId: audiences.labelId,
+        label: i18nLabels,
+      })
+      .from(audiences)
+      .leftJoin(i18nLabels, eq(audiences.labelId, i18nLabels.id))
+      .orderBy(audiences.code)
 
-  return results.map(row => ({
-    id: row.id,
-    code: row.code,
-    labelId: row.labelId,
-    label: row.label,
-  }))
-}
+    return results.map(row => ({
+      id: row.id,
+      code: row.code,
+      labelId: row.labelId,
+      label: row.label,
+    }))
+  },
+  ['audiences-all'],
+  {
+    revalidate: 86400, // 24 hours
+    tags: ['audiences']
+  }
+)
 
 /**
  * Get audience by code

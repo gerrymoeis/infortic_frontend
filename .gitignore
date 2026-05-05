@@ -38,6 +38,7 @@ yarn-error.log*
 
 # opennext / cloudflare
 .open-next/
+.wrangler/
 
 # typescript
 *.tsbuildinfo

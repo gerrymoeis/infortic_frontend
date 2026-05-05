@@ -1,14 +1,14 @@
 /**
  * Database Client Configuration
- * Drizzle ORM with postgres.js driver
+ * Drizzle ORM with Neon serverless driver
  * 
  * Connection: Neon PostgreSQL (serverless)
- * Pool: 10 connections max
- * SSL: Required
+ * Compatible with: Cloudflare Workers, Edge Runtime, Node.js
+ * Uses HTTP for connections (no WebSocket needed)
  */
 
-import { drizzle, type PostgresJsDatabase } from 'drizzle-orm/postgres-js'
-import postgres from 'postgres'
+import { drizzle } from 'drizzle-orm/neon-http'
+import { neon } from '@neondatabase/serverless'
 import * as schema from './schema'
 
 /**
@@ -29,30 +29,23 @@ function getConnectionString(): string {
 }
 
 /**
- * Singleton instances
+ * Singleton instance
  */
-let clientInstance: ReturnType<typeof postgres> | null = null
-let dbInstance: PostgresJsDatabase<typeof schema> | null = null
+let dbInstance: ReturnType<typeof drizzle> | null = null
 
 /**
  * Get or create database instance
  * Lazy initialization - only creates connection when first used
  */
-function getDb(): PostgresJsDatabase<typeof schema> {
+function getDb() {
   if (!dbInstance) {
     const connectionString = getConnectionString()
     
-    clientInstance = postgres(connectionString, {
-      max: 10, // Connection pool size
-      idle_timeout: 20, // Close idle connections after 20s
-      connect_timeout: 10, // Timeout for new connections
-      ssl: 'require', // Required for Neon PostgreSQL
-      connection: {
-        application_name: 'infortic_frontend',
-      },
-    })
+    // Create Neon HTTP client
+    const sql = neon(connectionString)
     
-    dbInstance = drizzle(clientInstance, { schema })
+    // Create Drizzle instance with schema
+    dbInstance = drizzle(sql, { schema })
   }
   
   return dbInstance
@@ -64,7 +57,7 @@ function getDb(): PostgresJsDatabase<typeof schema> {
  * 
  * This uses a Proxy to ensure lazy initialization
  */
-export const db = new Proxy({} as PostgresJsDatabase<typeof schema>, {
+export const db = new Proxy({} as ReturnType<typeof drizzle>, {
   get(target, prop) {
     const instance = getDb()
     return (instance as any)[prop]
@@ -75,15 +68,3 @@ export const db = new Proxy({} as PostgresJsDatabase<typeof schema>, {
  * Type export for use in other files
  */
 export type Database = typeof db
-
-/**
- * Graceful shutdown helper
- * Call this when shutting down the application
- */
-export async function closeDatabase() {
-  if (clientInstance) {
-    await clientInstance.end()
-    clientInstance = null
-    dbInstance = null
-  }
-}
