@@ -17,7 +17,13 @@ const nextConfig: NextConfig = {
         hostname: 'images.infortic.com',
         pathname: '/**',
       },
-      // Instagram CDN domains (temporary until images are migrated to R2)
+      // Cloudflare R2 CDN (primary image source)
+      {
+        protocol: 'https',
+        hostname: 'infortic-images.gerrymoeis.workers.dev',
+        pathname: '/**',
+      },
+      // Instagram CDN domains (legacy, for images not yet migrated)
       {
         protocol: 'https',
         hostname: '**.cdninstagram.com',
