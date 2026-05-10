@@ -20,7 +20,8 @@
     "pages:build": "npx @opennextjs/cloudflare build",
     "pages:deploy": "npm run pages:build && wrangler pages deploy .vercel/output/static",
     "deploy": "npm run pages:build && wrangler deploy",
-    "deploy:production": "wrangler deploy --env production"
+    "deploy:production": "wrangler deploy --env production",
+    "push": "git push && npm run deploy"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
