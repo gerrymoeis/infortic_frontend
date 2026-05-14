@@ -20,10 +20,10 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
   
   return (
     <Link href={`/opportunities/${opportunity.slug}`}>
-      <Card className="h-full transition-all hover:border-blue-300">
+      <Card className="h-full hover:border-primary-300">
         {/* Image */}
         {opportunity.imageUrl && (
-          <div className="relative h-48 w-full overflow-hidden rounded-t-lg bg-gray-100">
+          <div className="relative h-48 w-full overflow-hidden rounded-t-lg bg-neutral-100">
             <OptimizedImage
               src={opportunity.imageUrl}
               alt={opportunity.title}
@@ -53,14 +53,14 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
         <CardContent>
           {/* Description */}
           {opportunity.description && (
-            <p className="mb-3 line-clamp-2 text-sm text-gray-600">
+            <p className="mb-3 line-clamp-2 text-sm text-neutral-600">
               {truncateText(opportunity.description, 100)}
             </p>
           )}
           
           {/* Organizer */}
           {opportunity.organizer && (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-neutral-500">
               oleh {opportunity.organizer.name}
             </p>
           )}
@@ -70,8 +70,8 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
           {/* Deadline */}
           {deadline.formatted && (
             <div className="flex items-center gap-2 text-sm">
-              <span className="text-gray-500">Deadline:</span>
-              <span className={deadline.isUrgent ? 'font-medium text-red-600' : 'text-gray-900'}>
+              <span className="text-neutral-500">Deadline:</span>
+              <span className={deadline.isUrgent ? 'font-medium text-error-600' : 'text-neutral-900'}>
                 {deadline.formatted}
               </span>
             </div>

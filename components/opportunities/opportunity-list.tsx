@@ -6,6 +6,7 @@
 import { OpportunityCard } from './opportunity-card'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Button } from '@/components/ui/button'
+import { Search } from 'lucide-react'
 import type { OpportunityListItem } from '@/types/database'
 
 interface OpportunityListProps {
@@ -22,7 +23,7 @@ export function OpportunityList({
   if (opportunities.length === 0) {
     return (
       <EmptyState
-        icon="🔍"
+        icon={Search}
         title="Tidak Ada Hasil"
         description={emptyMessage}
         action={

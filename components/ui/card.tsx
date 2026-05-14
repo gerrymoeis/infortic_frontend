@@ -1,6 +1,6 @@
 /**
  * Card Component
- * Reusable card container with variants
+ * Reusable card container with hover animations
  */
 
 import { cn } from '@/lib/utils/cn'
@@ -13,7 +13,9 @@ export function Card({ children, className, ...props }: CardProps) {
   return (
     <div
       className={cn(
-        'rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md',
+        'rounded-lg border border-neutral-200 bg-white p-6 shadow-sm',
+        'transition-all duration-150',
+        'hover:shadow-md hover:-translate-y-0.5',
         className
       )}
       {...props}
@@ -33,7 +35,7 @@ export function CardHeader({ children, className, ...props }: CardProps) {
 
 export function CardTitle({ children, className, ...props }: CardProps) {
   return (
-    <h3 className={cn('text-lg font-semibold text-gray-900', className)} {...props}>
+    <h3 className={cn('text-lg font-semibold text-neutral-900', className)} {...props}>
       {children}
     </h3>
   )
@@ -41,7 +43,7 @@ export function CardTitle({ children, className, ...props }: CardProps) {
 
 export function CardDescription({ children, className, ...props }: CardProps) {
   return (
-    <p className={cn('text-sm text-gray-600', className)} {...props}>
+    <p className={cn('text-sm text-neutral-600', className)} {...props}>
       {children}
     </p>
   )
