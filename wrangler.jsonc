@@ -23,5 +23,13 @@
 		// Enable image optimization
 		// see https://opennext.js.org/cloudflare/howtos/image
 		"binding": "IMAGES"
+	},
+	"observability": {
+		"logs": {
+			// Enable logging to Workers dashboard
+			"enabled": true,
+			// Include invocation logs (request/response metadata)
+			"invocation_logs": true
+		}
 	}
 }
