@@ -194,13 +194,15 @@ export function OpportunitiesClient({
       <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
         {/* Filters Sidebar - Desktop (always visible on lg+) */}
         <aside className="hidden w-64 shrink-0 lg:block">
-          <div className="sticky top-24 rounded-lg border border-gray-200 bg-white p-6">
-            <OpportunityFilters
-              types={types}
-              audiences={audiences}
-              filters={filters}
-              onFilterChange={setFilters}
-            />
+          <div className="sticky top-44 max-h-[calc(100vh-12rem)] overflow-y-auto rounded-lg border border-gray-200 bg-white">
+            <div className="p-6">
+              <OpportunityFilters
+                types={types}
+                audiences={audiences}
+                filters={filters}
+                onFilterChange={setFilters}
+              />
+            </div>
           </div>
         </aside>
 
