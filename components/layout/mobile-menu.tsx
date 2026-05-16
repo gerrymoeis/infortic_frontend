@@ -70,7 +70,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             aria-modal="true"
             aria-label="Mobile navigation menu"
           >
-        <div className="flex h-full flex-col">
+            <div className="flex h-full flex-col">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-neutral-200 px-4 py-4">
             <h2 className="text-lg font-semibold text-neutral-900">Menu</h2>
@@ -121,9 +121,9 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           <div className="border-t border-neutral-200 px-4 py-4">
             <p className="text-sm text-neutral-500">© 2026 Infortic</p>
           </div>
-        </div>
-      </motion.div>
-    </>
+            </div>
+          </motion.div>
+        </>
       )}
     </AnimatePresence>
   )
