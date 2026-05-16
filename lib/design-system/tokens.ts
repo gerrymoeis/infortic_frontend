@@ -211,13 +211,25 @@ export const maxWidth = {
 // Z-INDEX SCALE
 // ============================================================================
 
+/**
+ * Z-Index Hierarchy
+ * Ensures proper stacking order for UI elements
+ * 
+ * Usage:
+ * import { zIndex } from '@/lib/design-system/tokens'
+ * className={`z-${zIndex.navbar}`} // Not recommended, use direct values
+ * style={{ zIndex: zIndex.navbar }} // Recommended for dynamic values
+ */
 export const zIndex = {
-  base: 0,
-  dropdown: 10,
-  sticky: 20,
-  fixed: 30,
-  overlay: 40,
-  modal: 50,
-  popover: 60,
-  tooltip: 70,
+  base: 0,          // Base content layer
+  dropdown: 10,     // Dropdown menus
+  sticky: 20,       // Sticky elements (search bar)
+  fixed: 30,        // Fixed position elements
+  fab: 40,          // Floating Action Buttons
+  overlay: 50,      // Backdrop overlays
+  drawer: 60,       // Slide-out drawers (mobile menu, filter panel)
+  modal: 70,        // Modal dialogs
+  navbar: 80,       // Navigation bar (always on top)
+  popover: 90,      // Popovers
+  tooltip: 100,     // Tooltips (highest)
 } as const

@@ -2,14 +2,18 @@
 
 /**
  * Opportunities Client Component
- * Handles client-side search, filter, and sort
+ * Handles client-side search, filter, sort, and pagination
  */
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { OpportunityList } from './opportunity-list'
 import { OpportunitySearch } from './opportunity-search'
 import { OpportunityFilters, ActiveFilters, type FilterState } from './opportunity-filters'
 import { OpportunitySort, type SortOption } from './opportunity-sort'
+import { FilterFAB } from './filter-fab'
+import { FilterPanel } from './filter-panel'
+import { Pagination } from '@/components/ui/pagination'
 import type { OpportunityListItem, OpportunityTypeWithLabel, AudienceWithLabel } from '@/types/database'
 
 interface OpportunitiesClientProps {
@@ -18,11 +22,16 @@ interface OpportunitiesClientProps {
   audiences: AudienceWithLabel[]
 }
 
+const ITEMS_PER_PAGE = 20
+
 export function OpportunitiesClient({
   initialOpportunities,
   types,
   audiences,
 }: OpportunitiesClientProps) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState<SortOption>('newest')
   const [filters, setFilters] = useState<FilterState>({
@@ -31,7 +40,20 @@ export function OpportunitiesClient({
     feeTypes: [],
     eventTypes: [],
   })
-  const [showMobileFilters, setShowMobileFilters] = useState(false)
+  const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false)
+  
+  // Get current page from URL or default to 1
+  const currentPage = parseInt(searchParams.get('page') || '1', 10)
+
+  // Count active filters
+  const activeFilterCount = useMemo(() => {
+    return (
+      filters.types.length +
+      filters.audiences.length +
+      filters.feeTypes.length +
+      filters.eventTypes.length
+    )
+  }, [filters])
 
   // Filter and sort opportunities
   const filteredOpportunities = useMemo(() => {
@@ -94,6 +116,27 @@ export function OpportunitiesClient({
     return result
   }, [initialOpportunities, searchQuery, filters, sortBy])
 
+  // Paginate filtered results
+  const totalPages = Math.ceil(filteredOpportunities.length / ITEMS_PER_PAGE)
+  const paginatedOpportunities = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE
+    const end = start + ITEMS_PER_PAGE
+    return filteredOpportunities.slice(start, end)
+  }, [filteredOpportunities, currentPage])
+
+  // Reset to page 1 when filters or search changes
+  useEffect(() => {
+    if (currentPage > 1) {
+      router.push('/opportunities?page=1', { scroll: false })
+    }
+  }, [searchQuery, filters, sortBy]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handlePageChange = (page: number) => {
+    router.push(`/opportunities?page=${page}`, { scroll: true })
+    // Scroll to top smoothly
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   const handleRemoveFilter = (category: keyof FilterState, value: string) => {
     setFilters({
       ...filters,
@@ -101,24 +144,21 @@ export function OpportunitiesClient({
     })
   }
 
+  // Calculate display range
+  const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1
+  const endItem = Math.min(currentPage * ITEMS_PER_PAGE, filteredOpportunities.length)
+
   return (
     <div className="space-y-6">
-      {/* Search and Sort Bar */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex-1 sm:max-w-md">
-          <OpportunitySearch onSearch={setSearchQuery} />
-        </div>
-        <div className="flex items-center gap-4">
-          <OpportunitySort value={sortBy} onChange={setSortBy} />
-          <button
-            onClick={() => setShowMobileFilters(!showMobileFilters)}
-            className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 lg:hidden"
-          >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-            </svg>
-            Filter
-          </button>
+      {/* Sticky Search and Sort Bar */}
+      <div className="sticky top-16 z-[20] -mx-4 bg-white/95 px-4 pb-4 backdrop-blur-sm border-b border-neutral-200 sm:-mx-0 sm:mx-0 sm:rounded-lg sm:border">
+        <div className="flex flex-col gap-4 pt-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex-1 sm:max-w-md">
+            <OpportunitySearch onSearch={setSearchQuery} />
+          </div>
+          <div className="flex items-center gap-4">
+            <OpportunitySort value={sortBy} onChange={setSortBy} />
+          </div>
         </div>
       </div>
 
@@ -131,8 +171,14 @@ export function OpportunitiesClient({
       />
 
       {/* Results Count */}
-      <div className="text-sm text-gray-600">
-        Menampilkan {filteredOpportunities.length} dari {initialOpportunities.length} peluang
+      <div className="text-sm text-neutral-600">
+        {filteredOpportunities.length > 0 ? (
+          <>
+            Menampilkan {startItem}-{endItem} dari {filteredOpportunities.length} peluang
+          </>
+        ) : (
+          <>Tidak ada peluang ditemukan</>
+        )}
       </div>
 
       {/* Main Content */}
@@ -149,41 +195,47 @@ export function OpportunitiesClient({
           </div>
         </aside>
 
-        {/* Filters Panel - Mobile (collapsible) */}
-        {showMobileFilters && (
-          <div className="rounded-lg border border-gray-200 bg-white p-6 lg:hidden">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Filter</h3>
-              <button
-                onClick={() => setShowMobileFilters(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <OpportunityFilters
-              types={types}
-              audiences={audiences}
-              filters={filters}
-              onFilterChange={setFilters}
-            />
-          </div>
-        )}
-
         {/* Opportunities List */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 space-y-8">
           <OpportunityList
-            opportunities={filteredOpportunities}
+            opportunities={paginatedOpportunities}
             emptyMessage={
               searchQuery || filters.types.length > 0
                 ? 'Tidak ada peluang yang sesuai dengan pencarian atau filter Anda.'
                 : 'Tidak ada peluang yang tersedia saat ini.'
             }
           />
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          )}
         </div>
       </div>
+
+      {/* Filter FAB - Mobile only */}
+      <FilterFAB
+        activeFilterCount={activeFilterCount}
+        onClick={() => setIsFilterPanelOpen(true)}
+      />
+
+      {/* Filter Panel - Mobile only */}
+      <FilterPanel
+        isOpen={isFilterPanelOpen}
+        onClose={() => setIsFilterPanelOpen(false)}
+        types={types}
+        audiences={audiences}
+        filters={filters}
+        onFilterChange={setFilters}
+        onApply={() => {
+          // Filter already applied via setFilters
+          // This just closes the panel
+        }}
+      />
     </div>
   )
 }

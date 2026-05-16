@@ -75,12 +75,12 @@ export function OpportunityFilters({
         <h4 className="mb-3 text-sm font-medium text-gray-900">Kategori</h4>
         <div className="space-y-2">
           {types.map((type) => (
-            <label key={type.id} className="flex items-center gap-2 cursor-pointer">
+            <label key={type.id} className="flex items-center gap-3 cursor-pointer min-h-[44px]">
               <input
                 type="checkbox"
                 checked={filters.types.includes(type.code)}
                 onChange={() => toggleFilter('types', type.code)}
-                className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-600"
+                className="h-5 w-5 rounded border-gray-300 text-primary-600 focus:ring-primary-600 focus:ring-2"
               />
               <span className="text-sm text-gray-700">
                 {type.label?.value || type.code}
@@ -95,12 +95,12 @@ export function OpportunityFilters({
         <h4 className="mb-3 text-sm font-medium text-gray-900">Target Peserta</h4>
         <div className="space-y-2">
           {audiences.map((audience) => (
-            <label key={audience.id} className="flex items-center gap-2 cursor-pointer">
+            <label key={audience.id} className="flex items-center gap-3 cursor-pointer min-h-[44px]">
               <input
                 type="checkbox"
                 checked={filters.audiences.includes(audience.code)}
                 onChange={() => toggleFilter('audiences', audience.code)}
-                className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-600"
+                className="h-5 w-5 rounded border-gray-300 text-primary-600 focus:ring-primary-600 focus:ring-2"
               />
               <span className="text-sm text-gray-700">
                 {audience.label?.value || audience.code.toUpperCase()}
@@ -114,21 +114,21 @@ export function OpportunityFilters({
       <div>
         <h4 className="mb-3 text-sm font-medium text-gray-900">Biaya</h4>
         <div className="space-y-2">
-          <label className="flex items-center gap-2 cursor-pointer">
+          <label className="flex items-center gap-3 cursor-pointer min-h-[44px]">
             <input
               type="checkbox"
               checked={filters.feeTypes.includes('gratis')}
               onChange={() => toggleFilter('feeTypes', 'gratis')}
-              className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-600"
+              className="h-5 w-5 rounded border-gray-300 text-primary-600 focus:ring-primary-600 focus:ring-2"
             />
             <span className="text-sm text-gray-700">Gratis</span>
           </label>
-          <label className="flex items-center gap-2 cursor-pointer">
+          <label className="flex items-center gap-3 cursor-pointer min-h-[44px]">
             <input
               type="checkbox"
               checked={filters.feeTypes.includes('htm')}
               onChange={() => toggleFilter('feeTypes', 'htm')}
-              className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-600"
+              className="h-5 w-5 rounded border-gray-300 text-primary-600 focus:ring-primary-600 focus:ring-2"
             />
             <span className="text-sm text-gray-700">Berbayar</span>
           </label>
@@ -139,30 +139,30 @@ export function OpportunityFilters({
       <div>
         <h4 className="mb-3 text-sm font-medium text-gray-900">Format Acara</h4>
         <div className="space-y-2">
-          <label className="flex items-center gap-2 cursor-pointer">
+          <label className="flex items-center gap-3 cursor-pointer min-h-[44px]">
             <input
               type="checkbox"
               checked={filters.eventTypes.includes('online')}
               onChange={() => toggleFilter('eventTypes', 'online')}
-              className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-600"
+              className="h-5 w-5 rounded border-gray-300 text-primary-600 focus:ring-primary-600 focus:ring-2"
             />
             <span className="text-sm text-gray-700">Online</span>
           </label>
-          <label className="flex items-center gap-2 cursor-pointer">
+          <label className="flex items-center gap-3 cursor-pointer min-h-[44px]">
             <input
               type="checkbox"
               checked={filters.eventTypes.includes('offline')}
               onChange={() => toggleFilter('eventTypes', 'offline')}
-              className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-600"
+              className="h-5 w-5 rounded border-gray-300 text-primary-600 focus:ring-primary-600 focus:ring-2"
             />
             <span className="text-sm text-gray-700">Offline</span>
           </label>
-          <label className="flex items-center gap-2 cursor-pointer">
+          <label className="flex items-center gap-3 cursor-pointer min-h-[44px]">
             <input
               type="checkbox"
               checked={filters.eventTypes.includes('hybrid')}
               onChange={() => toggleFilter('eventTypes', 'hybrid')}
-              className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-600"
+              className="h-5 w-5 rounded border-gray-300 text-primary-600 focus:ring-primary-600 focus:ring-2"
             />
             <span className="text-sm text-gray-700">Hybrid</span>
           </label>
