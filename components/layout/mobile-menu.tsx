@@ -53,7 +53,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[50] bg-black/50"
+            className="fixed inset-0 z-overlay bg-black/50"
             onClick={onClose}
             aria-hidden="true"
           />
@@ -64,7 +64,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             animate={slideInRight.animate}
             exit={slideInRight.exit}
             transition={slideInRight.transition}
-            className="fixed inset-y-0 right-0 z-[60] w-full max-w-sm bg-white shadow-xl"
+            className="fixed inset-y-0 right-0 z-drawer w-full max-w-sm bg-white shadow-xl"
             style={{ isolation: 'isolate' }}
             role="dialog"
             aria-modal="true"

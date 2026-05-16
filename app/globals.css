@@ -128,6 +128,13 @@
   /* Typography */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  /* Z-Index Scale */
+  --z-index-20: 20;
+  --z-index-40: 40;
+  --z-index-50: 50;
+  --z-index-60: 60;
+  --z-index-80: 80;
 }
 
 /* Apply Geist font to body */
@@ -258,6 +265,27 @@ body {
 /* ============================================================================
    UTILITY CLASSES
    ============================================================================ */
+
+/* Z-Index utilities */
+.z-navbar {
+  z-index: 80;
+}
+
+.z-drawer {
+  z-index: 60;
+}
+
+.z-overlay {
+  z-index: 50;
+}
+
+.z-fab {
+  z-index: 40;
+}
+
+.z-sticky-search {
+  z-index: 20;
+}
 
 /* Text truncation */
 .line-clamp-1 {

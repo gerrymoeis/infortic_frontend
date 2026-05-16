@@ -75,7 +75,7 @@ export function FilterPanel({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[50] bg-black/50 lg:hidden"
+            className="fixed inset-0 z-overlay bg-black/50 lg:hidden"
             onClick={onClose}
             aria-hidden="true"
           />
@@ -86,7 +86,7 @@ export function FilterPanel({
             animate={slideInRight.animate}
             exit={slideInRight.exit}
             transition={slideInRight.transition}
-            className="fixed inset-y-0 right-0 z-[60] w-full max-w-sm bg-white shadow-xl lg:hidden"
+            className="fixed inset-y-0 right-0 z-drawer w-full max-w-sm bg-white shadow-xl lg:hidden"
             style={{ isolation: 'isolate' }}
             role="dialog"
             aria-modal="true"

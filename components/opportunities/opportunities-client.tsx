@@ -151,7 +151,7 @@ export function OpportunitiesClient({
   return (
     <div className="space-y-6">
       {/* Sticky Search and Sort Bar */}
-      <div className="sticky top-16 z-[20] -mx-4 bg-white/95 px-4 pb-4 backdrop-blur-sm border-b border-neutral-200 sm:-mx-0 sm:mx-0 sm:rounded-lg sm:border">
+      <div className="sticky top-16 z-sticky-search -mx-4 bg-white px-4 pb-4 border-b border-neutral-200 sm:-mx-0 sm:mx-0 sm:rounded-lg sm:border">
         <div className="flex flex-col gap-4 pt-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex-1 sm:max-w-md">
             <OpportunitySearch onSearch={setSearchQuery} />
