@@ -82,12 +82,26 @@ export const slideIn = {
 
 /**
  * Slide In From Right
- * Use for: Mobile menu specifically
+ * Use for: Filter panel (slide from right)
  */
 export const slideInRight = {
   initial: { x: '100%', opacity: 0 },
   animate: { x: 0, opacity: 1 },
   exit: { x: '100%', opacity: 0 },
+  transition: { 
+    duration: duration.normal / 1000, 
+    ease: easing.snappy 
+  }
+} as const
+
+/**
+ * Slide In From Top
+ * Use for: Mobile menu (slide from top)
+ */
+export const slideInTop = {
+  initial: { y: '-100%', opacity: 0 },
+  animate: { y: 0, opacity: 1 },
+  exit: { y: '-100%', opacity: 0 },
   transition: { 
     duration: duration.normal / 1000, 
     ease: easing.snappy 

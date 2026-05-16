@@ -2,13 +2,13 @@
 
 /**
  * Mobile Menu Component
- * Slide-out navigation drawer with smooth animations
+ * Slide-down navigation drawer with smooth animations
  */
 
 import { useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { slideInRight } from '@/lib/design-system/animations'
+import { slideInTop } from '@/lib/design-system/animations'
 
 interface MobileMenuProps {
   isOpen: boolean
@@ -60,11 +60,11 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
           {/* Drawer */}
           <motion.div
-            initial={slideInRight.initial}
-            animate={slideInRight.animate}
-            exit={slideInRight.exit}
-            transition={slideInRight.transition}
-            className="fixed inset-y-0 right-0 z-drawer w-full max-w-sm bg-white shadow-xl"
+            initial={slideInTop.initial}
+            animate={slideInTop.animate}
+            exit={slideInTop.exit}
+            transition={slideInTop.transition}
+            className="fixed inset-x-0 top-0 z-drawer w-full bg-white shadow-xl"
             style={{ isolation: 'isolate' }}
             role="dialog"
             aria-modal="true"

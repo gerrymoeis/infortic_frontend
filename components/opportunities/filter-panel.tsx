@@ -98,10 +98,11 @@ export function FilterPanel({
                 <h2 className="text-lg font-semibold text-neutral-900">Filter</h2>
                 <button
                   onClick={onClose}
-                  className="min-h-[44px] min-w-[44px] rounded-lg p-2 text-neutral-400 transition-colors duration-150 hover:bg-neutral-100 hover:text-neutral-600 active:scale-95"
-                  aria-label="Close filter panel"
+                  className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-neutral-100 p-2 text-neutral-700 transition-colors duration-150 hover:bg-neutral-200 hover:text-neutral-900 active:scale-95"
+                  aria-label="Tutup filter"
+                  title="Tutup filter"
                 >
-                  <X className="h-6 w-6" aria-hidden="true" />
+                  <X className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />
                 </button>
               </div>
 
