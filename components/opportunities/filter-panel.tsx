@@ -8,7 +8,6 @@
 
 import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X } from 'lucide-react'
 import { slideInRight } from '@/lib/design-system/animations'
 import { OpportunityFilters, type FilterState } from './opportunity-filters'
 import { Button } from '@/components/ui/button'
@@ -96,14 +95,6 @@ export function FilterPanel({
               {/* Header */}
               <div className="flex items-center justify-between border-b border-neutral-200 px-4 py-4">
                 <h2 className="text-lg font-semibold text-neutral-900">Filter</h2>
-                <button
-                  onClick={onClose}
-                  className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-neutral-100 p-2 text-neutral-700 transition-colors duration-150 hover:bg-neutral-200 hover:text-neutral-900 active:scale-95"
-                  aria-label="Tutup filter"
-                  title="Tutup filter"
-                >
-                  <X className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />
-                </button>
               </div>
 
               {/* Filter Content */}
@@ -128,6 +119,26 @@ export function FilterPanel({
               </div>
             </div>
           </motion.div>
+
+          {/* Fixed Close Button - Same position as FAB */}
+          <motion.button
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            transition={{ duration: 0.2, delay: 0.1 }}
+            onClick={onClose}
+            className="fixed bottom-6 right-6 z-fab flex h-14 w-14 items-center justify-center rounded-full bg-neutral-900 text-white shadow-lg transition-all duration-150 hover:bg-neutral-800 hover:shadow-xl active:scale-95 lg:hidden"
+            aria-label="Tutup filter"
+            title="Tutup filter"
+          >
+            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5} aria-hidden="true">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </motion.button>
         </>
       )}
     </AnimatePresence>
