@@ -21,6 +21,7 @@ interface FilterPanelProps {
   filters: FilterState
   onFilterChange: (filters: FilterState) => void
   onApply: () => void
+  onReset: () => void
 }
 
 export function FilterPanel({
@@ -31,6 +32,7 @@ export function FilterPanel({
   filters,
   onFilterChange,
   onApply,
+  onReset,
 }: FilterPanelProps) {
   // Prevent body scroll when panel is open
   useEffect(() => {
@@ -85,7 +87,7 @@ export function FilterPanel({
             animate={slideInRight.animate}
             exit={slideInRight.exit}
             transition={slideInRight.transition}
-            className="fixed inset-y-0 right-0 z-drawer w-full max-w-sm bg-white shadow-xl lg:hidden"
+            className="fixed inset-y-0 right-0 z-drawer w-full max-w-xs bg-white shadow-xl lg:hidden"
             style={{ isolation: 'isolate' }}
             role="dialog"
             aria-modal="true"
@@ -107,8 +109,16 @@ export function FilterPanel({
                 />
               </div>
 
-              {/* Footer with Apply Button */}
-              <div className="border-t border-neutral-200 px-4 py-4">
+              {/* Footer with Reset and Apply Buttons */}
+              <div className="space-y-3 border-t border-neutral-200 px-4 py-4">
+                <Button
+                  onClick={onReset}
+                  variant="outline"
+                  className="w-full"
+                  size="lg"
+                >
+                  Reset Filter
+                </Button>
                 <Button
                   onClick={handleApply}
                   className="w-full"
@@ -120,14 +130,15 @@ export function FilterPanel({
             </div>
           </motion.div>
 
-          {/* Fixed Close Button - Same position as FAB */}
+          {/* Fixed Close Button - Higher z-index than drawer */}
           <motion.button
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             transition={{ duration: 0.2, delay: 0.1 }}
             onClick={onClose}
-            className="fixed bottom-6 right-6 z-fab flex h-14 w-14 items-center justify-center rounded-full bg-neutral-900 text-white shadow-lg transition-all duration-150 hover:bg-neutral-800 hover:shadow-xl active:scale-95 lg:hidden"
+            className="fixed bottom-6 right-6 z-modal flex h-14 w-14 items-center justify-center rounded-full bg-neutral-900 text-white shadow-xl transition-all duration-150 hover:bg-neutral-800 hover:shadow-2xl active:scale-95 lg:hidden"
+            style={{ zIndex: 70 }}
             aria-label="Tutup filter"
             title="Tutup filter"
           >

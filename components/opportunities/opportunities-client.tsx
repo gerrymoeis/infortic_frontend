@@ -144,6 +144,15 @@ export function OpportunitiesClient({
     })
   }
 
+  const handleResetFilters = () => {
+    setFilters({
+      types: [],
+      audiences: [],
+      feeTypes: [],
+      eventTypes: [],
+    })
+  }
+
   // Calculate display range
   const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1
   const endItem = Math.min(currentPage * ITEMS_PER_PAGE, filteredOpportunities.length)
@@ -231,6 +240,7 @@ export function OpportunitiesClient({
         audiences={audiences}
         filters={filters}
         onFilterChange={setFilters}
+        onReset={handleResetFilters}
         onApply={() => {
           // Filter already applied via setFilters
           // This just closes the panel
